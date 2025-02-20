@@ -124,7 +124,6 @@ table tr:hover {
   background: #f1f1f1;
 }
 
-/* Delete Button Styling */
 .delete-btn {
   padding: 8px 12px;
   background: #ff4d4d;
@@ -139,4 +138,19 @@ table tr:hover {
 
 .delete-btn:hover {
   background: #cc0000;
+}
+.edit-btn {
+  padding: 8px 12px;
+  background: #4d79ff;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.edit-btn:hover {
+  background: #0040cc;
 }

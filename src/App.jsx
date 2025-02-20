@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import "./index.css";
 
-function Table({ arr, deleteBook }) {
+function Table({ books, deleteBook, editBook }) {
   return (
     <table>
       <thead>
@@ -9,18 +9,24 @@ function Table({ arr, deleteBook }) {
           <th>Name</th>
           <th>Author</th>
           <th>Year</th>
-          <th>Action</th>
+          <th>Delete</th>
+          <th>Edit</th>
         </tr>
       </thead>
       <tbody>
-        {arr.map((item, index) => (
+        {books.map((book, index) => (
           <tr key={index}>
-            <td>{item.name}</td>
-            <td>{item.author}</td>
-            <td>{item.year}</td>
+            <td>{book.name}</td>
+            <td>{book.author}</td>
+            <td>{book.year}</td>
             <td>
               <button className="delete-btn" onClick={() => deleteBook(index)}>
                 Delete
+              </button>
+            </td>
+            <td>
+              <button className="edit-btn" onClick={() => editBook(index)}>
+                Edit
               </button>
             </td>
           </tr>
@@ -31,33 +37,34 @@ function Table({ arr, deleteBook }) {
 }
 
 function App() {
-  const [book_list, setBookList] = useState([
+  const [books, setBooks] = useState([
     { name: "Book 1", author: "Author 1", year: 2000 },
     { name: "Book 2", author: "Author 2", year: 2001 },
   ]);
 
+  const [editIndex, setEditIndex] = useState(null);
   const nameRef = useRef();
   const authorRef = useRef();
   const yearRef = useRef();
 
-  const addBook = () => {
-    if (
-      !nameRef.current.value.trim() ||
-      !authorRef.current.value.trim() ||
-      !yearRef.current.value.trim()
-    ) {
-      alert("Please fill in all fields before adding a book.");
+  const saveBook = () => {
+    const name = nameRef.current.value.trim();
+    const author = authorRef.current.value.trim();
+    const year = yearRef.current.value.trim();
+
+    if (!name || !author || !year) {
+      alert("Please fill in all fields before saving.");
       return;
     }
 
-    setBookList([
-      ...book_list,
-      {
-        name: nameRef.current.value,
-        author: authorRef.current.value,
-        year: Number(yearRef.current.value), 
-      },
-    ]);
+    if (editIndex === null) {
+      setBooks([...books, { name, author, year: Number(year) }]);
+    } else {
+      const updatedBooks = [...books];
+      updatedBooks[editIndex] = { name, author, year: Number(year) };
+      setBooks(updatedBooks);
+      setEditIndex(null);
+    }
 
     nameRef.current.value = "";
     authorRef.current.value = "";
@@ -65,21 +72,30 @@ function App() {
   };
 
   const deleteBook = (index) => {
-    const updatedList = book_list.filter((_, i) => i !== index);
-    setBookList(updatedList);
+    setBooks(books.filter((_, i) => i !== index));
+  };
+
+  const editBook = (index) => {
+    const book = books[index];
+    nameRef.current.value = book.name;
+    authorRef.current.value = book.author;
+    yearRef.current.value = book.year;
+    setEditIndex(index);
   };
 
   return (
     <div className="container">
       <div className="App">
         <h1>Book List</h1>
-        <input ref={nameRef} type="text" placeholder="Enter the name of book" />
-        <input ref={authorRef} type="text" placeholder="Enter the name of author" />
-        <input ref={yearRef} type="number" placeholder="Enter the year of book" />
-        <button onClick={addBook}>Add New Book</button>
+        <input ref={nameRef} type="text" placeholder="Enter book name" />
+        <input ref={authorRef} type="text" placeholder="Enter author name" />
+        <input ref={yearRef} type="number" placeholder="Enter year" />
+        <button onClick={saveBook}>
+          {editIndex === null ? "Add Book" : "Update Book"}
+        </button>
       </div>
       <div className="BookList">
-        <Table arr={book_list} deleteBook={deleteBook} />
+        <Table books={books} deleteBook={deleteBook} editBook={editBook} />
       </div>
     </div>
   );
